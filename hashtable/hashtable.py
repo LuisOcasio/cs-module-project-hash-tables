@@ -2,10 +2,11 @@ class HashTableEntry:
     """
     Linked List hash table key/value pair
     """
+
     def __init__(self, key, value):
         self.key = key
         self.value = value
-        self.next = None
+        self.next = None  # Make this a linked list node
 
 
 # Hash table can't have fewer than this many slots
@@ -22,7 +23,8 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
-
+        self.storage = [None] * capacity
+        self.capacity = capacity
 
     def get_num_slots(self):
         """
@@ -36,7 +38,6 @@ class HashTable:
         """
         # Your code here
 
-
     def get_load_factor(self):
         """
         Return the load factor for this hash table.
@@ -44,8 +45,15 @@ class HashTable:
         Implement this.
         """
         # Your code here
+#  set storage
+#  storage = [None,None,None,None,None]
 
+#  hashing function that takes some value and returns and index for the array
 
+#  myHash(s) => 0-4
+
+#  hash function returns some value
+#  save our value to the returned hash value
     def fnv1(self, key):
         """
         FNV-1 Hash, 64-bit
@@ -54,23 +62,38 @@ class HashTable:
         """
 
         # Your code here
+        seed = 0
+        FNV_prime = 1099511628211
+        offset_basis = 14695981039346656037
 
+        hash = offset_basis + seed
+        for char in key:
+            hash = hash * FNV_prime
+            hash = hash ^ ord(char)
+        return hash
 
     def djb2(self, key):
         """
         DJB2 hash, 32-bit
-
         Implement this, and/or FNV-1.
         """
-        # Your code here
-
+        # $%$Start
+        # Cast the key to a string and get bytes
+        str_key = str(key).encode()
+        # Start from an arbitrary large prime
+        hash_value = 5381
+        # Bit-shift and sum value for each character
+        for b in str_key:
+            hash_value = ((hash_value << 5) + hash_value) + b
+            hash_value &= 0xffffffff  # DJB2 is a 32-bit hash, only keep 32 bits
+        return hash_value
 
     def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
+        # return self.fnv1(key) % self.capacity
         return self.djb2(key) % self.capacity
 
     def put(self, key, value):
@@ -82,7 +105,10 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        # get index to store key
+        # store key value
+        slot = self.hash_index(key)
+        self.storage[slot] = value
 
     def delete(self, key):
         """
@@ -93,7 +119,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        self.put(key, None)
 
     def get(self, key):
         """
@@ -104,7 +130,10 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        # get hash value
+        # get index
+        slot = self.hash_index(key)
+        return self.storage[slot]
 
     def resize(self, new_capacity):
         """
@@ -114,7 +143,6 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
 
 
 if __name__ == "__main__":
